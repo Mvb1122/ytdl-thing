@@ -6,14 +6,19 @@ const sanitize = require('sanitize-filename');
 const green = '\x1b[32m';
 const reset = '\x1b[0m';
 
-function dl(url) {
+function dl(url, doVideo) {
     return new Promise(async res => {
         const info = await ytdl.getInfo(url);
-        const format = info.formats.find(v => (v.mimeType ?? "").includes("audio"));
+        const formatType = doVideo ? "video" : "audio";
+        const format = info.formats.find(v => (v.mimeType ?? "").includes(formatType));
+        const outputFormat = doVideo ? ".mp4" : `.mp3`;
+        
+        
         console.log(`Downloading ${green}${info.videoDetails.title}${reset} in format ${format.container}`);
 
-        const tempPath = sanitize(`Temp_${info.videoDetails.title}.${format.container}`);
-        const path = sanitize(`${info.videoDetails.title}`) + `.mp3`;
+        const tempPath = "./output/" + sanitize(`Temp_${info.videoDetails.title}.${format.container}`);
+        const path = "./output/" + sanitize(`${info.videoDetails.title}`) + outputFormat;
+        
         ytdl(url, { format: format })
             .pipe(fs.createWriteStream(tempPath))
             .on('close', () => {
@@ -39,10 +44,17 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-rl.question(`Please enter the URL to download: ${green}`, URL => {
-    dl(URL).then(() => {
-        console.log("Finished downloading!")
-        rl.close();
-        process.exit(0);
-    });
+if (!fs.existsSync(`./output/`)) fs.mkdirSync("./output/");
+
+rl.question(`Please enter the URL to download:${green} `, async URL => {
+    let video = await new Promise(res => {
+        rl.question(`${white}Video? (Y/N)${green} `, ans => {
+            res(ans.toLowerCase().includes("y"));
+        })
+    })
+
+    await dl(URL, video);
+    console.log("Finished downloading!")
+    rl.close();
+    process.exit(0);
 });
