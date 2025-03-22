@@ -9,6 +9,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@distube/ytdl-core": "^4.14.4"
+    "@distube/ytdl-core": "^4.16.5"
   }
 }
