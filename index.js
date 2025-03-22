@@ -1,6 +1,8 @@
 const fs = require('fs');
 const ytdl = require("@distube/ytdl-core");
 const { spawn } = require('child_process');
+const sanitize = require('sanitize-filename');
+
 const green = '\x1b[32m';
 const reset = '\x1b[0m';
 
@@ -10,8 +12,8 @@ function dl(url) {
         const format = info.formats.find(v => (v.mimeType ?? "").includes("audio"));
         console.log(`Downloading ${green}${info.videoDetails.title}${reset} in format ${format.container}`);
 
-        const tempPath = `Temp_${info.videoDetails.title}.${format.container}`;
-        const path = `${info.videoDetails.title}.mp3`;
+        const tempPath = sanitize(`Temp_${info.videoDetails.title}.${format.container}`);
+        const path = sanitize(`${info.videoDetails.title}`) + `.mp3`;
         ytdl(url, { format: format })
             .pipe(fs.createWriteStream(tempPath))
             .on('close', () => {

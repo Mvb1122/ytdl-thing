@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.5"
+    "@distube/ytdl-core": "^4.16.5",
+    "sanitize-filename": "^1.6.3"
   }
 }
